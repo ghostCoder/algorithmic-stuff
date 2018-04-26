@@ -1,40 +1,23 @@
-/**
- * Created by Naman on 24/04/18.
- */
-function deletionDistance(str1, str2, resultMap) {
-  var str1Length = str1.length;
-  var str2Length = str2.length;
-  var result;
+function deletionDistance(str1, str2) {
+  var str1Len = str1.length;
+  var str2Len = str2.length;
+  var memo = Array.from({ length: str1Len + 1 }, function () {
+    return [];
+  });
 
-  if (resultMap && typeof(resultMap[str1Length][str2Length]) != "undefined") {
-    return resultMap[str1Length][str2Length];
-  }
-
-  if (!str1 && !str2) {
-    result = 0;
-  }
-  if (!str1 && str2) {
-    result = str2Length;
-  }
-  if (str1 && !str2) {
-    result = str1Length;
-  }
-
-  if (!resultMap) {
-    resultMap = Array.from({ length: str1Length+1 }, function(){ return [];});
+  for (var i = 0; i <= str1Len; i++) {
+    for (var j = 0; j <= str2Len; j++) {
+      if (i == 0) {
+        memo[i][j] = j;
+      } else if (j == 0) {
+        memo[i][j] = i;
+      } else if (str1[i - 1] == str2[j - 1]) {
+        memo[i][j] = memo[i - 1][j - 1];
+      } else {
+        memo[i][j] = 1 + Math.min(memo[i - 1][j], memo[i][j - 1]);
+      }
+    }
   }
 
-  if (typeof(result) != "undefined") {
-    return result;
-  }
-
-  if (str1[str1Length - 1] === str2[str2Length - 1]) {
-    result = deletionDistance(str1.substring(0, str1Length - 1), str2.substring(0, str2Length - 1), resultMap);
-    resultMap[str1Length][str2Length] = result;
-    return result;
-  }
-
-  result = 1 + Math.min(deletionDistance(str1, str2.substring(0, str2Length - 1), resultMap), deletionDistance(str1.substring(0, str1Length - 1), str2, resultMap));
-  resultMap[str1Length][str2Length] = result;
-  return result;
+  return memo[str1Len][str2Len];
 }
